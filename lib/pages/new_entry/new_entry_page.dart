@@ -337,8 +337,8 @@ class _NewEntryPageState extends State<NewEntryPage> {
 
     await flutterLocalNotificationsPlugin.zonedSchedule(
       121,
-      'New Medicine has been added. ',
-      '${medicine.medicineName} Added. We will send reminder according to your reminder.',
+      'New ${medicine.medicineType} has been added. ',
+      '${medicine.medicineName} Added. We will send reminder according to your schedule.',
       scheduledTimetmp,
       platformChannelSpecifics,
       androidAllowWhileIdle: true,

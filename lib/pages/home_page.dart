@@ -11,9 +11,21 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:permission_handler/permission_handler.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    super.initState();
+    requestNotificationPermission();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +39,6 @@ class HomePage extends StatelessWidget {
             SizedBox(
               height: 2.h,
             ),
-            //the widget take space as per need
             const Flexible(
               child: BottomContainer(),
             ),
@@ -36,14 +47,12 @@ class HomePage extends StatelessWidget {
       ),
       floatingActionButton: InkResponse(
         onTap: () {
-          //go to new entry page
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => const NewEntryPage(),
             ),
           );
-          // scheduleNotificationInOneMinute();
         },
         child: SizedBox(
           width: 18.w,
@@ -96,7 +105,6 @@ class TopContainer extends StatelessWidget {
         SizedBox(
           height: 2.h,
         ),
-        //show number of saved medicines from shared preferences
         StreamBuilder<List<Medicine>>(
             stream: globalBloc.medicineList$,
             builder: (context, snapshot) {
@@ -125,7 +133,6 @@ class BottomContainer extends StatelessWidget {
       stream: globalBloc.medicineList$,
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          //if no data is saved
           return Container();
         } else if (snapshot.data!.isEmpty) {
           return Center(
@@ -154,14 +161,8 @@ class BottomContainer extends StatelessWidget {
 class MedicineCard extends StatelessWidget {
   const MedicineCard({Key? key, required this.medicine}) : super(key: key);
   final Medicine medicine;
-  //for getting the current details of the saved items
-
-  //first we need to get the medicine type icon
-  //lets make a function
 
   Hero makeIcon(double size) {
-    //here is the bug, the capital word of the first letter
-    //lets fix
     if (medicine.medicineType == 'Bottle') {
       return Hero(
         tag: medicine.medicineName! + medicine.medicineType!,
@@ -199,7 +200,7 @@ class MedicineCard extends StatelessWidget {
         ),
       );
     }
-    //in case of no medicine type icon selection
+
     return Hero(
       tag: medicine.medicineName! + medicine.medicineType!,
       child: Icon(
@@ -216,8 +217,6 @@ class MedicineCard extends StatelessWidget {
       highlightColor: Colors.white,
       splashColor: Colors.grey,
       onTap: () {
-        //go to details activity with animation, later
-
         Navigator.of(context).push(
           PageRouteBuilder<void>(
             pageBuilder: (BuildContext context, Animation<double> animation,
@@ -248,11 +247,8 @@ class MedicineCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Spacer(),
-            //call the function here icon type
-            //later we will the icon issue
             makeIcon(7.h),
             const Spacer(),
-            //hero tag animation, later
             Hero(
               tag: medicine.medicineName!,
               child: Text(
@@ -265,7 +261,6 @@ class MedicineCard extends StatelessWidget {
             SizedBox(
               height: 0.3.h,
             ),
-            //time interval data with condition, later
             Text(
               medicine.interval == 1
                   ? "Every ${medicine.interval} hour"
@@ -285,10 +280,8 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
 Future<void> scheduleNotificationInOneMinute() async {
-  // Initialize timezone package
   tz.initializeTimeZones();
 
-  // Initialize notification settings
   const AndroidInitializationSettings initializationSettingsAndroid =
       AndroidInitializationSettings('@mipmap/ic_launcher');
 
@@ -297,18 +290,16 @@ Future<void> scheduleNotificationInOneMinute() async {
 
   await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
-  // Get the current time and schedule the notification for 1 minute later
   final DateTime now = DateTime.now();
   final tz.TZDateTime scheduledDate =
       tz.TZDateTime.from(now.add(Duration(minutes: 1)), tz.local);
 
-  // Debug console print for scheduled time
   print("Notification scheduled for: $scheduledDate");
 
   const AndroidNotificationDetails androidPlatformChannelSpecifics =
       AndroidNotificationDetails(
-    'your_channel_id', // Channel ID
-    'your_channel_name', // Channel Name
+    'your_channel_id',
+    'your_channel_name',
     channelDescription: 'your_channel_description',
     importance: Importance.max,
     priority: Priority.high,
@@ -317,17 +308,35 @@ Future<void> scheduleNotificationInOneMinute() async {
   const NotificationDetails platformChannelSpecifics =
       NotificationDetails(android: androidPlatformChannelSpecifics);
 
-  // Schedule the notification
   await flutterLocalNotificationsPlugin.zonedSchedule(
-    0, // Notification ID
-    'Scheduled Notification', // Notification title
-    'This notification was scheduled to appear 1 minute after now!', // Notification body
-    scheduledDate, // Time when the notification should appear
+    0,
+    'Scheduled Notification',
+    'This notification was scheduled to appear 1 minute after now!',
+    scheduledDate,
     platformChannelSpecifics,
     androidAllowWhileIdle: true,
     uiLocalNotificationDateInterpretation:
         UILocalNotificationDateInterpretation.absoluteTime,
-    matchDateTimeComponents:
-        DateTimeComponents.time, // Match on full date and time
+    matchDateTimeComponents: DateTimeComponents.time,
   );
+}
+
+Future<void> requestNotificationPermission() async {
+  var status = await Permission.notification.status;
+
+  if (!status.isGranted) {
+    final result = await Permission.notification.request();
+
+    if (result.isGranted) {
+      print("Notification permission granted.");
+    } else if (result.isDenied) {
+      print("Notification permission denied.");
+    } else if (result.isPermanentlyDenied) {
+      print("Notification permission permanently denied.");
+
+      openAppSettings();
+    }
+  } else {
+    print("Notification permission already granted.");
+  }
 }
