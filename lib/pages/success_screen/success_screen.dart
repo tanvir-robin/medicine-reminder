@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
+import 'package:medicine_reminder/pages/home_page.dart';
 
 class SuccessScreen extends StatefulWidget {
   const SuccessScreen({Key? key}) : super(key: key);
@@ -15,7 +16,9 @@ class _SuccessScreenState extends State<SuccessScreen> {
     // TODO: implement initState
     super.initState();
     Timer(const Duration(milliseconds: 2500), () {
-      Navigator.popUntil(context, ModalRoute.withName('/'));
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+        builder: (context) => const HomePage(),
+      ));
     });
   }
 
