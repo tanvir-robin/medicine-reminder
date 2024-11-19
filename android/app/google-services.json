@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "237911679905",
+    "project_id": "medicine-reminder-a898d",
+    "storage_bucket": "medicine-reminder-a898d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:237911679905:android:058c99bc9e76e6848d21e0",
+        "android_client_info": {
+          "package_name": "com.example.medicine_reminder"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXd--ngIjjr8JvNqea3766_dd7UIhIyTE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

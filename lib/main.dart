@@ -1,6 +1,9 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:medicine_reminder/firebase_options.dart';
+import 'package:medicine_reminder/pages/auth/splash_screen.dart';
 
-import 'pages/home_page.dart';
 import 'package:sizer/sizer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +21,9 @@ Future selectNotification(String? payload) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   const AndroidInitializationSettings initializationSettingsAndroid =
       AndroidInitializationSettings('@mipmap/ic_launcher');
 
@@ -65,6 +71,7 @@ class _MyAppState extends State<MyApp> {
       value: globalBloc!,
       child: Sizer(builder: (context, orientation, deviceType) {
         return MaterialApp(
+          builder: EasyLoading.init(),
           title: 'Pill Reminder',
           //theme customization
           theme: ThemeData.dark().copyWith(
@@ -153,7 +160,7 @@ class _MyAppState extends State<MyApp> {
               ),
             ),
           ),
-          home: const HomePage(),
+          home: SplashScreen(),
         );
       }),
     );
